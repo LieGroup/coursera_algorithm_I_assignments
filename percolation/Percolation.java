@@ -24,28 +24,30 @@ public class Percolation {
         N = n;
         indexForTopVirtualSite = 0;
         indexForBottomVirtualSite = n * n + 1;
-        // connect virtual site to 1st and last line
-        for(int col = 1; col <= n; col++) {
-            uf.union(xyTo1D(1, col), indexForTopVirtualSite);
-            uf.union(xyTo1D(n, col), indexForBottomVirtualSite);
-        }
-
     }
 
     public void open(int i, int j) {
+        checkIndex(i, j);
         if (!isOpen(i, j)) {
+            siteStatus[i][j] = true;
             int indexForThisSite = xyTo1D(i, j);
-            if (i - 1 >= 1) {
-                uf.connected(xyTo1D(i - 1, j), indexForThisSite);
+            if (i == 1) {
+                uf.union(indexForTopVirtualSite, indexForThisSite);
             }
-            if (i + 1 <= n) {
-                uf.connected(xyTo1D(i + 1, j), indexForThisSite);
+            if (i == N) {
+                uf.union(indexForBottomVirtualSite, indexForThisSite);
             }
-            if (j - 1 >= 1) {
-                uf.connected(xyTo1D(i, j - 1), indexForThisSite);
+            if (i - 1 >= 1 && isOpen(i - 1, j)) {
+                uf.union(xyTo1D(i - 1, j), indexForThisSite);
             }
-            if (j + 1 <= n) {
-                uf.connected(xyTo1D(i, j + 1), indexForThisSite);
+            if (i + 1 <= N && isOpen(i + 1, j)) {
+                uf.union(xyTo1D(i + 1, j), indexForThisSite);
+            }
+            if (j - 1 >= 1 && isOpen(i, j - 1)) {
+                uf.union(xyTo1D(i, j - 1), indexForThisSite);
+            }
+            if (j + 1 <= N && isOpen(i, j + 1)) {
+                uf.union(xyTo1D(i, j + 1), indexForThisSite);
             }
         }
     }
@@ -64,5 +66,14 @@ public class Percolation {
 
     private int xyTo1D(int x, int y) {
         return (x-1) * N + y;
+    }
+
+    private void checkIndex(int i, int j) {
+        if (i < 1 || i > N) {
+            throw new IndexOutOfBoundsException("row index must between 1 and " + N);
+        }
+        if (j < 1 || j > N) {
+            throw new IndexOutOfBoundsException("column index must between 1 and " + N);
+        }
     }
 }
